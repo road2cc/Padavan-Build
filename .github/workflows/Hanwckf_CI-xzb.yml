@@ -1,7 +1,7 @@
-# Build from hanwckf repo
+# Build from road2cc repo
 # BY: TurBoTse
 
-name: Build from hanwckf repo
+name: Build from road2cc repo
 
 on: 
   workflow_dispatch:
@@ -15,7 +15,7 @@ env:
   images_dir: /opt/images                                       # 固件目录
   work_dir: /opt/padavan/trunk                                  # 工作目录
   config_dir: /opt/padavan/trunk/configs/templates              # 设备模板目录
-  src_git: https://github.com/hanwckf/rt-n56u.git               # 源码地址
+  src_git: https://github.com/road2cc/rt-n56u.git               # 源码地址
 
 jobs:
   build:
@@ -58,9 +58,9 @@ jobs:
           sh dl_toolchain.sh
       - name: Modify custom configs
         run: |                         # 拷贝文件并修改
-          if [ -d hanwckf/config ]; then cp -f hanwckf/config/* $work_dir; fi
-          if [ -d hanwckf/modify ]; then cp -rf hanwckf/modify/* $work_dir; fi
-          if [ -d hanwckf/scripts ]; then cp -f hanwckf/scripts/* $work_dir; fi
+          if [ -d road2cc/config ]; then cp -f road2cc/config/* $work_dir; fi
+          if [ -d road2cc/modify ]; then cp -rf road2cc/modify/* $work_dir; fi
+          if [ -d road2cc/scripts ]; then cp -f road2cc/scripts/* $work_dir; fi
           cd $config_dir
           for m in $targets; do if [ -f $m.config ]; then \
           for MOD in UFSD FAT EXFAT EXT2 EXT3 EXT4 XFS FUSE SWAP; do
@@ -75,13 +75,13 @@ jobs:
         run: |                         # 执行构建固件
           cd $work_dir
           for m in $targets; do fakeroot ./build_firmware_ci $m; \
-          if [ $? = 0 ]; then cp -f images/*.trx $images_dir/Hanwckf_${m}_$(date +%Y%m%d).trx; else exit 1; fi; \
+          if [ $? = 0 ]; then cp -f images/*.trx $images_dir/road2cc_${m}_$(date +%Y%m%d).trx; else exit 1; fi; \
           ./clear_tree_simple >/dev/null 2>&1; done
       - name: Upload images to Artifact
         if: ${{ success() }}
         uses: actions/upload-artifact@v2.2.1
         with:
-          name: Hanwckf_3.4_${{ env.build_variant }}
+          name: road2cc_3.4_${{ env.build_variant }}
           path: ${{ env.images_dir }}
       - name: Upload images to WeTransfer
         if: ${{ github.event.inputs.uploadwet == 'true' && success() }}
